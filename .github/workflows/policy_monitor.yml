@@ -9,7 +9,7 @@ on:
         default: '5'
         type: string
   schedule:
-    - cron: '50 14 * * *'
+    - cron: '50 15 * * *'
     
 jobs:
   run:
