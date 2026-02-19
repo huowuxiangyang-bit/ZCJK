@@ -6,7 +6,7 @@ on:
       policy_days:
         description: '抓取近N天的政策'
         required: false
-        default: '7'
+        default: '10'
         type: string
   schedule:
     - cron: '0 10 * * *'
