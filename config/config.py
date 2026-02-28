@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 class Config:
     DEEPSEEK_API_KEY = None
     WECHAT_WEBHOOK_URL = None
-    POLICY_DAYS = 1
+    POLICY_DAYS = 0
     MONITOR_SITES = []
     
     @classmethod
