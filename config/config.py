@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 class Config:
     DEEPSEEK_API_KEY = None
     WECHAT_WEBHOOK_URL = None
-    POLICY_DAYS = 0
+    POLICY_DAYS = 1
     MONITOR_SITES = []
     
     @classmethod
@@ -24,7 +24,7 @@ class Config:
             try:
                 cls.POLICY_DAYS = int(policy_days)
             except ValueError:
-                cls.POLICY_DAYS = 5
+                cls.POLICY_DAYS = 1
         
         cls.MONITOR_SITES = []
         if env_path.exists():
