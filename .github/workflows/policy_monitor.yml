@@ -33,7 +33,7 @@ jobs:
           mkdir -p config
           echo "DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}" > config/.env
           echo "WECHAT_WEBHOOK_URL=${{ secrets.WECHAT_WEBHOOK_URL }}" >> config/.env
-          echo "POLICY_DAYS=${{ github.event.inputs.policy_days || '5' }}" >> config/.env
+          echo "POLICY_DAYS=${{ github.event.inputs.policy_days || '1' }}" >> config/.env
           echo "MONITOR_SITES=https://gss.mof.gov.cn/gzdt/zhengcefabu/" >> config/.env
           echo "MONITOR_SITES=https://www.miit.gov.cn/zwgk/zcwj/index.html" >> config/.env
           echo "MONITOR_SITES=https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/index.html" >> config/.env
