@@ -40,6 +40,8 @@ jobs:
           echo "MONITOR_SITES=https://www.ndrc.gov.cn/xxgk/" >> config/.env
           echo "MONITOR_SITES=https://www.mofcom.gov.cn/zcfb/index.html" >> config/.env
           echo "MONITOR_SITES=https://www.gov.cn/zhengce/zuixin/" >> config/.env
+          echo "MONITOR_SITES=https://www.csrc.gov.cn/csrc/xwfb/index.shtml" >> config/.env
+          echo "MONITOR_SITES=https://www.nfra.gov.cn/cn/view/pages/ItemList.html?itemPId=914&itemId=917" >> config/.env
       
       - name: Run policy monitor
         run: python main.py
