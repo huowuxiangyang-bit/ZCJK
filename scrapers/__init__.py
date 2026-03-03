@@ -6,3 +6,5 @@ from .pb_scraper import PBScraper
 from .ndrc_scraper import NDRCScraper
 from .mofcom_scraper import MOFCOMScraper
 from .gov_scraper import GOVScraper
+from .csrc_scraper import CSRCScraper
+from .nfra_scraper import NFRAcraper

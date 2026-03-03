@@ -18,6 +18,8 @@
 - 发改委
 - 商务部
 - 国务院办公厅
+- 证监会
+- 金融管理总局
 
 ## 环境要求
 
@@ -124,7 +126,9 @@ ZhengCe/
 │   ├── pb_scraper.py      # 人民银行
 │   ├── ndrc_scraper.py    # 发改委
 │   ├── mofcom_scraper.py  # 商务部
-│   └── gov_scraper.py     # 国务院
+│   ├── gov_scraper.py     # 国务院
+│   ├── csrc_scraper.py   # 证监会
+│   └── nfra_scraper.py   # 金融管理总局
 ├── .github/workflows/
 │   └── policy_monitor.yml # GitHub Actions配置
 ├── main.py               # 主程序

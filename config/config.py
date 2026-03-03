@@ -33,6 +33,8 @@ class Config:
                     line = line.strip()
                     if line.startswith('MONITOR_SITES='):
                         url = line.split('=', 1)[1].strip()
+                        if '#' in url:
+                            url = url.split('#')[0].strip()
                         if url and not url.startswith('#'):
                             cls.MONITOR_SITES.append(url)
         

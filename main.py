@@ -5,7 +5,7 @@ sys.path.append(str(Path(__file__).parent))
 
 from config import Config
 from modules import WeChatNotifier, DeepSeekAnalyzer, DateFilter
-from scrapers import MOFScraper, MIITScraper, PBScraper, NDRCScraper, MOFCOMScraper, GOVScraper
+from scrapers import MOFScraper, MIITScraper, PBScraper, NDRCScraper, MOFCOMScraper, GOVScraper, CSRCScraper, NFRAcraper
 
 class PolicyMonitor:
     def __init__(self):
@@ -22,7 +22,9 @@ class PolicyMonitor:
             'pbc.gov.cn': PBScraper,
             'ndrc.gov.cn': NDRCScraper,
             'mofcom.gov.cn': MOFCOMScraper,
-            'gov.cn': GOVScraper
+            'gov.cn': GOVScraper,
+            'csrc.gov.cn': CSRCScraper,
+            'nfra.gov.cn': NFRAcraper
         }
     
     def add_scraper(self, scraper):
