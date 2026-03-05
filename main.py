@@ -1,5 +1,8 @@
 import sys
 from pathlib import Path
+import json
+import os
+import hashlib
 
 sys.path.append(str(Path(__file__).parent))
 
@@ -14,8 +17,10 @@ class PolicyMonitor:
         self.deepseek_analyzer = DeepSeekAnalyzer(Config.DEEPSEEK_API_KEY)
         self.date_filter = DateFilter()
         self.scrapers = []
+        self.pushed_file = Path(__file__).parent / 'pushed_policies.json'
         
-        # URL到爬虫类的映射
+        self.run_type = getattr(Config, 'RUN_TYPE', 'manual')
+        
         self.scraper_map = {
             'mof.gov.cn': MOFScraper,
             'miit.gov.cn': MIITScraper,
@@ -36,6 +41,43 @@ class PolicyMonitor:
                 if domain in site_url:
                     self.add_scraper(scraper_class(site_url))
                     break
+    
+    def get_policy_hash(self, title: str, publish_date: str) -> str:
+        content = f"{title}_{publish_date}"
+        return hashlib.md5(content.encode('utf-8')).hexdigest()
+    
+    def load_pushed_policies(self) -> set:
+        if not self.pushed_file.exists():
+            return set()
+        try:
+            with open(self.pushed_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return set(data.get('pushed', []))
+        except:
+            return set()
+    
+    def save_pushed_policies(self, policies: list):
+        existing = self.load_pushed_policies()
+        for policy in policies:
+            policy_hash = self.get_policy_hash(policy.get('title', ''), policy.get('publish_date', ''))
+            existing.add(policy_hash)
+        
+        with open(self.pushed_file, 'w', encoding='utf-8') as f:
+            json.dump({'pushed': list(existing)}, f, ensure_ascii=False, indent=2)
+    
+    def filter_pushed_policies(self, policies: list) -> list:
+        if self.run_type == 'manual':
+            return policies
+        
+        pushed = self.load_pushed_policies()
+        filtered = []
+        for policy in policies:
+            policy_hash = self.get_policy_hash(policy.get('title', ''), policy.get('publish_date', ''))
+            if policy_hash not in pushed:
+                filtered.append(policy)
+            else:
+                print(f"  [已推送，跳过] {policy.get('title', '')}")
+        return filtered
     
     def process_policies(self):
         all_beneficial_policies = []
@@ -87,16 +129,24 @@ class PolicyMonitor:
     def run(self):
         print("=" * 50)
         print("政策监控程序启动")
+        print(f"运行类型: {'定时运行' if self.run_type == 'schedule' else '手动运行'}")
         print("=" * 50)
         
         beneficial_policies = self.process_policies()
+        
+        if self.run_type == 'schedule':
+            beneficial_policies = self.filter_pushed_policies(beneficial_policies)
         
         print(f"\n共发现 {len(beneficial_policies)} 条利好政策")
         
         if beneficial_policies:
             print("开始推送消息...")
-            success_count = self.wechat_notifier.send_batch_messages(beneficial_policies)
+            success_count = self.wechat_notifier.send_batch_messages(beneficial_policies, self.run_type)
             print(f"成功推送 {success_count}/{len(beneficial_policies)} 条消息")
+            
+            if success_count > 0 and self.run_type == 'schedule':
+                self.save_pushed_policies(beneficial_policies)
+                print(f"已保存 {len(beneficial_policies)} 条政策记录")
         else:
             print("没有需要推送的政策")
         
@@ -106,10 +156,7 @@ class PolicyMonitor:
 
 def main():
     monitor = PolicyMonitor()
-    
-    # 自动从配置文件添加监控网站
     monitor.auto_add_scrapers()
-    
     monitor.run()
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ class Config:
     WECHAT_WEBHOOK_URL = None
     POLICY_DAYS = 1
     MONITOR_SITES = []
+    RUN_TYPE = 'manual'
     
     @classmethod
     def load(cls):
@@ -25,6 +26,8 @@ class Config:
                 cls.POLICY_DAYS = int(policy_days)
             except ValueError:
                 cls.POLICY_DAYS = 1
+        
+        cls.RUN_TYPE = os.getenv('RUN_TYPE', 'manual')
         
         cls.MONITOR_SITES = []
         if env_path.exists():

@@ -6,7 +6,11 @@ class WeChatNotifier:
     def __init__(self, webhook_url: str):
         self.webhook_url = webhook_url
     
-    def send_message(self, title: str, interpretation: str, url: str, beneficiary: str = '', companies: list = None, benefit_level: str = '', benefit_reason: str = '') -> bool:
+    def send_message(self, title: str, interpretation: str, url: str, beneficiary: str = '', companies: list = None, benefit_level: str = '', benefit_reason: str = '', run_type: str = 'manual') -> bool:
+        run_type_str = '手动运行'
+        if run_type == 'schedule':
+            run_type_str = '定时运行'
+        
         companies_str = ''
         if companies:
             companies_str = '\n\n**相关公司：**' + '、'.join(companies[:5])
@@ -26,7 +30,7 @@ class WeChatNotifier:
         message = {
             "msgtype": "markdown",
             "markdown": {
-                "content": f"### 【新政策提醒】\n\n**政策名称：**{title}{beneficiary_str}{level_str}{reason_str}{companies_str}\n\n**政策解读：**{interpretation}\n\n[查看原文]({url})"
+                "content": f"### 【新政策提醒】({run_type_str})\n\n**政策名称：**{title}{beneficiary_str}{level_str}{reason_str}{companies_str}\n\n**政策解读：**{interpretation}\n\n[查看原文]({url})"
             }
         }
         
@@ -47,7 +51,7 @@ class WeChatNotifier:
             print(f"企微推送异常: {e}")
             return False
     
-    def send_batch_messages(self, policies: list) -> int:
+    def send_batch_messages(self, policies: list, run_type: str = 'manual') -> int:
         success_count = 0
         for policy in policies:
             if self.send_message(
@@ -57,7 +61,8 @@ class WeChatNotifier:
                 policy.get('beneficiary', ''),
                 policy.get('companies', []),
                 policy.get('benefit_level', ''),
-                policy.get('benefit_reason', '')
+                policy.get('benefit_reason', ''),
+                run_type
             ):
                 success_count += 1
         return success_count
