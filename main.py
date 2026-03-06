@@ -66,17 +66,19 @@ class PolicyMonitor:
             json.dump({'pushed': list(existing)}, f, ensure_ascii=False, indent=2)
     
     def filter_pushed_policies(self, policies: list) -> list:
-        if self.run_type == 'manual':
-            return policies
-        
         pushed = self.load_pushed_policies()
         filtered = []
+        seen = set()
         for policy in policies:
             policy_hash = self.get_policy_hash(policy.get('title', ''), policy.get('publish_date', ''))
-            if policy_hash not in pushed:
-                filtered.append(policy)
-            else:
-                print(f"  [已推送，跳过] {policy.get('title', '')}")
+            url = policy.get('url', '')
+            
+            if policy_hash in pushed or url in seen:
+                print(f"  [已存在，跳过] {policy.get('title', '')}")
+                continue
+            
+            seen.add(url)
+            filtered.append(policy)
         return filtered
     
     def process_policies(self):
@@ -133,9 +135,7 @@ class PolicyMonitor:
         print("=" * 50)
         
         beneficial_policies = self.process_policies()
-        
-        if self.run_type == 'schedule':
-            beneficial_policies = self.filter_pushed_policies(beneficial_policies)
+        beneficial_policies = self.filter_pushed_policies(beneficial_policies)
         
         print(f"\n共发现 {len(beneficial_policies)} 条利好政策")
         
@@ -144,7 +144,7 @@ class PolicyMonitor:
             success_count = self.wechat_notifier.send_batch_messages(beneficial_policies, self.run_type)
             print(f"成功推送 {success_count}/{len(beneficial_policies)} 条消息")
             
-            if success_count > 0 and self.run_type == 'schedule':
+            if success_count > 0:
                 self.save_pushed_policies(beneficial_policies)
                 print(f"已保存 {len(beneficial_policies)} 条政策记录")
         else:
